@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_ctrl.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/29 11:10:31 by dcologgi          #+#    #+#             */
-/*   Updated: 2023/07/17 13:38:56 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:45:20 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 14:53:38 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,23 @@ static void	command_exit(t_shell *mini, t_args *node)
 {
 	printf("exit\n");
 	if (node->argument != NULL)
+	{
 		exit(ft_atoi(node->argument) % 256);
+		clear_mini(mini, 1);
+	}
 	exit(0);
 }
 
-void	builtin_exec(t_shell *mini, char **envp, t_args *node, char *temp)
+void	builtin_exec(t_shell *mini, t_args *node, char *temp)
 {
 	if (ft_strcmp(temp, "echo") == 0)
-		command_echo(mini, envp, node);
-	mini->flag_status = 0;
+		command_echo(mini, node);
 	if (ft_strcmp(temp, "cd") == 0)
 		command_cd(mini, node, node->argument);
 	else if (ft_strcmp(temp, "pwd") == 0)
 		command_pwd(mini, node);
 	else if (ft_strcmp(temp, "export") == 0)
-		command_export(mini, envp, node->argument);
+		command_export(mini, node->argument);
 	else if (ft_strcmp(temp, "unset") == 0)
 		command_unset(mini, node->argument);
 	else if (ft_strcmp(temp, "env") == 0)
@@ -79,6 +81,16 @@ void	command_env2(t_shell *mini, char *dollar)
 		else if (ft_strncmp(argument, (*mini->list)->argument,
 				ft_strlen((*mini->list)->argument)) == 0)
 			printf("%s\n", mini->new_envp[j]);
+		free(argument);
 		j++;
 	}
+}
+
+void	pipe_signal_utils(t_shell *mini, t_pipex *pipes, t_args *cur,
+		char ***commands)
+{
+	no_pipes(mini, pipes, cur, commands);
+	first_command_in_pipe(pipes, cur, commands);
+	last_command_in_pipe(pipes, cur, commands);
+	mid_command_in_pipe(pipes, cur, commands);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test_input.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/06 15:39:25 by dcologgi          #+#    #+#             */
-/*   Updated: 2023/07/14 14:53:51 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:49:59 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:35:37 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	first(t_varie *var, char *str, int len)
 				var->doublequotesstack--;
 		}
 		else if (!var->withinquotes && !var->withindoublequotes
-			&& is_delimiter(str[var->i], str, var->i))
+			&& is_delimiter(str[var->i]))
 			var->newlen++;
 	}
 }
@@ -92,6 +92,7 @@ static void	forth(t_varie *var, char *str)
 char	*insert_spaces(char *str, int len)
 {
 	t_varie	*var;
+	char	*res;
 
 	var = ft_calloc(1, sizeof(t_varie));
 	init_varie(var, len);
@@ -104,11 +105,15 @@ char	*insert_spaces(char *str, int len)
 		else if (str[var->i] == '\"')
 			var->withindoublequotes = !var->withindoublequotes;
 		if (!var->withinquotes && !var->withindoublequotes
-			&& is_delimiter(str[var->i], str, var->i))
+			&& is_delimiter(str[var->i]))
 			third(var, str);
 		else
 			forth(var, str);
 	}
 	var->newstr[var->j] = '\0';
-	return (var->newstr);
+	res = ft_strdup(var->newstr);
+	free(str);
+	free(var->newstr);
+	free(var);
+	return (res);
 }

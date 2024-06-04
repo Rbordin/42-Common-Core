@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dcologgi <dcologgi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/09 11:07:12 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/13 16:42:13 by dcologgi         ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:43 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:34:04 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,16 @@ int	reassembling_strings(t_shell *mini, char **temp, int i)
 	return (j);
 }
 
+static void	what_was_inside(t_shell *mini, t_args **cur)
+{
+	char	*res;
+
+	res = check_path(mini, (*cur)->command);
+	free((*cur)->command);
+	(*cur)->command = ft_strdup(res);
+	free(res);
+}
+
 void	ultimating_commands(t_shell *mini)
 {
 	t_args	*cur;
@@ -82,9 +92,7 @@ void	ultimating_commands(t_shell *mini)
 		}
 		if (cur->command && cur->command[0] != '/'
 			&& check_builtin_presence(mini, cur->command) != 0)
-		{
-			cur->command = check_path(mini, cur->command);
-		}
+			what_was_inside(mini, &cur);
 		cur = cur->next;
 	}
 }
@@ -101,7 +109,7 @@ void	its_a_command(t_shell *mini, char *temp)
 	{
 		if ((*mini->high)->argument != NULL)
 			(*mini->high)->argument = ft_strjoin_mini((*mini->high)->argument,
-					temp, NO_FREE, NO_FREE);
+					temp, FREE, NO_FREE);
 		else
 			(*mini->high)->argument = ft_strdup(temp);
 	}

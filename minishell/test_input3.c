@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test_input3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/06 17:19:54 by gpecci            #+#    #+#             */
-/*   Updated: 2023/07/14 14:40:58 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:50:10 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:36:03 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	first_half(t_varie *var, char *s, char c)
 	}
 }
 
-void	sencond_half(t_varie *var, char *s, char c)
+void	second_half(t_varie *var, char *s)
 {
 	var->newstr[var->z++] = ' ';
 	if (s[var->i + 1] != ' ')

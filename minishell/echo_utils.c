@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   echo_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/10 09:39:49 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:32 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:46:56 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:42:17 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//norma ok 3 funzioni
+int	g_exit_status;
+
 int	ft_echo_strcheck(char const *s, char c)
 {
 	int	i;
@@ -31,6 +32,7 @@ int	check_quotes(t_shell *mini, char const *s, int i, char c)
 {
 	int	z;
 
+	(void)mini;
 	z = i + 1;
 	while (s[z] != c && s[z])
 		z++;
@@ -39,8 +41,18 @@ int	check_quotes(t_shell *mini, char const *s, int i, char c)
 	return (0);
 }
 
-void	command_echo(t_shell *mini, char **envp, t_args *current)
+static void	echo_print(t_args *current)
 {
+	write(1, current->argument, ft_strlen(current->argument));
+	if (current->flags == NULL)
+		write(1, "\n", 1);
+	g_exit_status = 0;
+}
+
+void	command_echo(t_shell *mini, t_args *current)
+{
+	char	*res;
+
 	if ((current->argument == NULL && current->flags != NULL)
 		|| (current->argument != NULL
 			&& (ft_strncmp(current->argument, "\"-n\"", 4) == 0)))
@@ -59,7 +71,9 @@ void	command_echo(t_shell *mini, char **envp, t_args *current)
 		return ;
 	}
 	echo_replacer(mini, current);
-	write(1, current->argument, ft_strlen(current->argument));
-	if (current->flags == NULL)
-		write(1, "\n", 1);
+	res = ft_strtrim(current->argument, "\"");
+	free(current->argument);
+	current->argument = ft_strdup(res);
+	echo_print(current);
+	free(res);
 }

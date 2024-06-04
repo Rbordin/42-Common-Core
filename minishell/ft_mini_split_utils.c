@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mini_split_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/05 15:54:25 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:00 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:30 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 16:07:27 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ char	*mini_p(t_shell *mini, int i, int j, int z)
 {
 	char	*str;
 	char	*s;
+	char	*temp;
 
 	str = NULL;
 	s = mini->input;
@@ -98,8 +99,10 @@ char	*mini_p(t_shell *mini, int i, int j, int z)
 	else
 	{
 		str = ft_substr(s, j, (size_t)(i - j));
-		str = ft_strtrim(str, "(");
-		str = ft_strtrim(str, ")");
+		temp = ft_strtrim(str, "(");
+		free(str);
+		str = ft_strtrim(temp, ")");
+		free(temp);
 	}
 	mini->flags.quote_flag = 0;
 	return (str);

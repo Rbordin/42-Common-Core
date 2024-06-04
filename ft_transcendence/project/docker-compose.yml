@@ -1,0 +1,43 @@
+networks:
+  front-end:
+  back-end:
+
+services:
+
+  postgre_sql:
+    image:
+    env_file:
+      - .env
+    build: ./src/postgre_sql
+    ports:
+      - "3306:3306"
+    volumes:
+      - postgre_sql_data:/data/
+    networks:
+      -back-end:
+
+  django:
+    env_file:
+      - .env
+    build: ./src/django
+    ports:
+      - "443:443"
+    depends_on:
+      - postgre_sql
+    networks:
+      -back-end:
+      -front-end:
+
+  front:
+    env_file:
+      - .env
+    build: ./src/front
+    ports:
+      - "8080:8080"
+    depends_on:
+      - django
+    networks:
+      -front-end:
+
+volumes:
+  postgre_sql_data:

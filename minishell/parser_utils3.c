@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils3.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dborgian <dborgian@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/09 11:08:55 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/12 09:55:30 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:50 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/09 17:48:15 by dborgian         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+extern int	g_exit_status;
 
 void	boh(t_shell *mini, char *temp)
 {
@@ -27,6 +29,7 @@ void	boh(t_shell *mini, char *temp)
 	{
 		mini->exit = 1;
 		mini->flag_status = 127;
+		g_exit_status = 127;
 		return ;
 	}
 	else
@@ -60,13 +63,13 @@ int	reassembling_brackets(t_shell *mini, char **temp, int i)
 
 void	its_a_flag(t_shell *mini, char *temp)
 {
-	if ((*mini->high)->flags == NULL )
+	if ((*mini->high)->flags == NULL)
 		(*mini->high)->flags = ft_strdup(temp);
 	else
 	{
 		if ((*mini->high)->argument != NULL)
 			(*mini->high)->argument = ft_strjoin_mini((*mini->high)->argument,
-					temp, NO_FREE, NO_FREE);
+					temp, FREE, NO_FREE);
 		else
 			(*mini->high)->argument = ft_strdup(temp);
 	}

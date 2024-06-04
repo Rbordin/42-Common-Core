@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/10 12:08:51 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/14 15:10:57 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:02 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:36:38 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,9 @@ extern int	g_exit_status;
 
 void	replacer(t_shell *mini)
 {
-	int		i;
-	char	*en;
 	t_args	*node;
 
 	node = *mini->list;
-	i = 0;
 	while (node != NULL)
 	{
 		if (node->argument != NULL && my_strchr(node->argument, '$') != -1
@@ -29,12 +26,7 @@ void	replacer(t_shell *mini)
 			&& ft_strcmp(node->command, "unset") != 0
 			&& ft_strcmp(node->command, "echo") != 0)
 		{
-			en = expanding_d(mini, node->argument);
-			if (en != NULL)
-			{
-				node->argument = ft_strdup(en);
-				break ;
-			}
+			echo_replacer(mini, node);
 		}
 		node = node->next;
 	}
@@ -42,7 +34,7 @@ void	replacer(t_shell *mini)
 
 char	*get_my_new_env(t_shell *mini, char *d)
 {
-	int	i;
+	int		i;
 
 	i = -1;
 	while (mini->new_envp[++i] != NULL)
@@ -57,7 +49,8 @@ char	*get_my_new_env(t_shell *mini, char *d)
 
 char	*get_my_env(t_shell *mini, char *d)
 {
-	int	i;
+	int		i;
+	char	*temp;
 
 	i = -1;
 	if (mini->new_envp != NULL)
@@ -66,32 +59,36 @@ char	*get_my_env(t_shell *mini, char *d)
 	{
 		if (ft_strncmp(mini->envp[i], d, ft_strlen(d)) == 0
 			&& mini->envp[i][ft_strlen(d)] == '=')
-			return (ft_substr(mini->envp[i], ft_strlen(d) + 1,
-					ft_strlen(mini->envp[i]) - ft_strlen(d) - 1));
+		{
+			temp = ft_substr(mini->envp[i], ft_strlen(d) + 1,
+					ft_strlen(mini->envp[i]) - ft_strlen(d) - 1);
+			return (temp);
+		}
 	}
 	return (NULL);
 }
 
-char	*expanding_d(t_shell *mini, char *s)
-{
-	char	*d;
-	char	*en;
+// char	*expanding_d(t_shell *mini, char *s)
+// {
+// 	char	*d;
+// 	char	*en;
 
-	d = ft_strtrim(s, "$");
-	en = get_my_env(mini, d);
-	if (d[0] == '?' && d[1] == '\0')
-	{
-		if (mini->flag_status != 0)
-		{
-			en = ft_itoa(mini->flag_status);
-			mini->flag_status = 0;
-		}
-		else
-			en = ft_itoa(WEXITSTATUS(g_exit_status));
-	}
-	free(d);
-	free(s);
-	if (!en)
-		return (NULL);
-	return (en);
-}
+// 	d = ft_strtrim(s, "$");
+// 	en = get_my_env(mini, d);
+// 	if (d[0] == '?')
+// 	{
+// 		if (mini->flag_status != 0)
+// 		{
+// 			en = ft_itoa(g_exit_status);
+// 			mini->flag_status = 0;
+// 			g_exit_status = 0;
+// 		}
+// 		else
+// 			en = ft_itoa(WEXITSTATUS(g_exit_status));
+// 	}
+// 	free(d);
+// 	free(s);
+// 	if (!en)
+// 		return (NULL);
+// 	return (en);
+// }

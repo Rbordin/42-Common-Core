@@ -3,16 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/11 16:20:15 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/17 13:36:33 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:37 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:33:35 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int	g_exit_status;
+
+static void	red_quantity(t_shell *mini, int res)
+{
+	if (res == 2 || res == 4)
+		(*mini->high)->redirection_quantity = 1;
+	else if (res == 1 || res == 3)
+		(*mini->high)->redirection_quantity = 2;
+}
 
 static void	calculating_flags(t_shell *mini, int res, char *temp)
 {
@@ -28,6 +36,8 @@ static void	calculating_flags(t_shell *mini, int res, char *temp)
 		mini->flags.pipes = 1;
 	if (ft_strlen(temp) < 3 && temp[0] != '>' && temp[0] != '<')
 	{
+		if ((*mini->high)->redirect != NULL)
+			free((*mini->high)->redirect);
 		(*mini->high)->redirect = ft_strdup(temp);
 		mini->command_presence = 0;
 	}
@@ -36,11 +46,7 @@ static void	calculating_flags(t_shell *mini, int res, char *temp)
 	else if (temp[0] != '>' && temp[0] != '<')
 		(*mini->high)->argument = ft_strjoin_mini((*mini->high)->argument, temp,
 				NO_FREE, NO_FREE);
-	if (res == 2 || res == 4)
-		(*mini->high)->redirection_quantity = 1;
-	else if (res == 1 || res == 3)
-		(*mini->high)->redirection_quantity = 2;
-	return ;
+	red_quantity(mini, res);
 }
 
 static void	making_outfile(t_shell *mini, char *temp)
@@ -70,7 +76,8 @@ static void	making_infile(t_shell *mini, char *temp)
 		(*mini->high)->infile = ft_strdup(temp);
 		mini->flags.redirect_input = 0;
 	}
-	else if (mini->command_presence != 0 && mini->flags.minor == 1)
+	else if (mini->command_presence != 0 && mini->flags.minor == 1
+		&& temp[0] != '<')
 	{
 		(*mini->high)->infile = ft_strdup(temp);
 		mini->flags.minor = 0;
@@ -88,7 +95,7 @@ static void	making_infile(t_shell *mini, char *temp)
 	}
 }
 
-void	its_not_a_command(t_shell *mini, char *temp, int i)
+void	its_not_a_command(t_shell *mini, char *temp)
 {
 	int	res;
 
@@ -106,6 +113,7 @@ void	its_not_a_command(t_shell *mini, char *temp, int i)
 		if (mini->flags.major == 0 && mini->flags.redirect_output == 0)
 		{
 			mini->flag_status = 127;
+			g_exit_status = 127;
 			return ;
 		}
 	}

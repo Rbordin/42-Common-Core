@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   matrix_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ertiz <ertiz@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/13 13:59:21 by enoviell          #+#    #+#             */
-/*   Updated: 2023/07/14 16:40:10 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:23 by tpiras            #+#    #+#             */
+/*   Updated: 2023/09/11 16:59:42 by ertiz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	count_size(t_args *node)
 			size++;
 			j++;
 		}
-		free(arguments);
+		free_matrix(arguments);
 	}
 	return (size);
 }
@@ -85,7 +85,7 @@ char	**create_matri(t_args *node)
 	{
 		arguments = ft_split(node->argument, ' ');
 		copy_arguments(temp + index, arguments);
-		free(arguments);
+		free_matrix(arguments);
 	}
 	temp[size] = NULL;
 	return (temp);

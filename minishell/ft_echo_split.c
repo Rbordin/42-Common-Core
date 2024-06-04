@@ -3,14 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   ft_echo_split.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/02 12:32:11 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/10 09:16:32 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:17 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:41:26 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "minishell.h"
 
 #include "minishell.h"
 
@@ -34,7 +32,7 @@ static unsigned int	ft_echo_counter(char const *s, char c)
 }
 
 static void	ft_echo_cicle(t_shell *mini, char const *s,
-	char **str, unsigned int count)
+	char **str)
 {
 	unsigned int	i;
 	unsigned int	j;
@@ -81,6 +79,6 @@ char	**ft_echo_split(t_shell *mini, char const *s, char c)
 		matrix[1] = NULL;
 	}
 	else
-		ft_echo_cicle(mini, s, matrix, i);
+		ft_echo_cicle(mini, s, matrix);
 	return (matrix);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wildcats.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/13 11:00:55 by dcologgi          #+#    #+#             */
-/*   Updated: 2023/07/14 10:00:22 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:50:16 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:58:07 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,12 @@ static void	wildtwo(t_args *node, char *d_name, int *c, char **temp)
 		if (node->argument[c[0]] == '*')
 		{
 			c[0]++;
-			while (node->argument[c[0]] != d_name[c[1]] && d_name[c[1]] != '\0')
+			while (node->argument[c[0]] != d_name[c[1]]
+				&& d_name[c[1]] != '\0')
 				c[1]++;
 			wildthree(node, d_name, c);
 			if (c[3] == 0 && node->argument[c[0]] == '\0')
-			{
-				temp[c[2]] = ft_strdup(d_name);
-				c[2]++;
-			}
+				temp[c[2]++] = ft_strdup(d_name);
 			if (c[3] == 1)
 				break ;
 		}
@@ -92,11 +90,11 @@ static void	wildfour(t_args *node, DIR *dir, int *count, char **temp)
 char	**wildone(t_shell *mini, t_args *node)
 {
 	DIR				*dir;
-	struct dirent	*test;
 	char			pwd_path[1024];
 	char			**temp;
 	int				count[4];
 
+	(void)mini;
 	getcwd(pwd_path, sizeof(pwd_path));
 	dir = opendir(pwd_path);
 	temp = ft_calloc(counting_dir(pwd_path) + 1, sizeof(char *));

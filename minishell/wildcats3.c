@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wildcats3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/13 12:18:11 by dcologgi          #+#    #+#             */
-/*   Updated: 2023/07/14 10:01:38 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:50:28 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:38:07 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	counting_dir(char *cartella)
 	return (nb);
 }
 
-void	**case_one( DIR *dir, char **temp)
+void	case_one( DIR *dir, char **temp)
 {
 	int				k;
 	struct dirent	*test;
@@ -50,6 +50,14 @@ void	**case_one( DIR *dir, char **temp)
 		test = readdir(dir);
 	}
 	temp[k] = NULL;
+	closedir(dir);
+}
+
+static void	hub(t_args *node, char *temp)
+{
+	free(node->argument);
+	node->argument = NULL;
+	node->argument = ft_strdup(temp);
 }
 
 void	control(char c, t_args *node)
@@ -60,7 +68,7 @@ void	control(char c, t_args *node)
 
 	i = 0;
 	j = 0;
-	temp = malloc(sizeof(char) * ft_strlen(node->argument) + 1);
+	temp = ft_calloc(ft_strlen(node->argument) + 1, sizeof(char));
 	while (node->argument[i] != '\0')
 	{
 		if (node->argument[i] == c)
@@ -77,6 +85,6 @@ void	control(char c, t_args *node)
 		j++;
 	}
 	temp[j] = '\0';
-	free(node->argument);
-	node->argument = ft_strdup(temp);
+	hub(node, temp);
+	free(temp);
 }

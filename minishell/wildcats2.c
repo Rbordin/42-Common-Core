@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wildcats2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/13 11:07:12 by dcologgi          #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:00 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:50:22 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 16:05:27 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,20 @@ static int	generate_argument(t_args *cur, char **ret)
 	return (0);
 }
 
+static void	support(t_args *cur)
+{
+	if(cur->argument[0] == '(' && cur->argument[ft_strlen(cur->argument) - 1] == ')')
+	{
+		cur->argument = ft_strtrim(cur->argument, "(");
+		cur->argument = ft_strtrim(cur->argument, ")");
+	}
+	if (ft_strcmp((cur->command), "echo") != 0 && cur->argument[0] == '\"')
+		cur->argument = ft_strtrim(cur->argument, "\"");
+	else if (ft_strcmp((cur->command), "echo") != 0
+		&& cur->argument[0] == '\'')
+		cur->argument = ft_strtrim(cur->argument, "\'");
+}
+
 void	wild(t_shell *mini)
 {
 	t_args	*cur;
@@ -58,6 +72,8 @@ void	wild(t_shell *mini)
 	ret = NULL;
 	while (cur != NULL)
 	{
+		if (cur->argument != NULL && cur->command != NULL)
+			support(cur);
 		if (cur->argument != NULL && my_strchr(cur->argument, '*') != -1)
 			i = my_strchr(cur->argument, '*');
 		if (cur->argument != NULL && i != -1
@@ -66,7 +82,7 @@ void	wild(t_shell *mini)
 		{
 			ret = wildone(mini, cur);
 			if (generate_argument(cur, ret) == 1)
-				free(ret);
+				free_matrix(ret);
 		}
 		if (cur->next == NULL)
 			return ;

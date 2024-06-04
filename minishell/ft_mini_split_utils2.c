@@ -3,43 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mini_split_utils2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/05 15:55:10 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/14 10:02:56 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:36 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:32:41 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	ft_mini_cicle(t_shell *mini, char *s, char **str, unsigned int count)
-{
-	int				i;
-	unsigned int	j;
-	unsigned int	k;
-	int				z;
-
-	i = 0;
-	k = -1;
-	while (s[i] != '\0')
-	{
-		while (s[i] == ' ')
-			i++;
-		j = i;
-		while (s[i] != ' ' && s[i] != '\0')
-		{
-			z = i;
-			if (s[i] == '\'' || s[i] == '\"' || s[i] == '(')
-				z = mini_g(mini, s, i, s[i]);
-			i = z;
-			if (mini->exit == 1)
-				return ;
-			i++;
-		}
-		str[++k] = mini_p(mini, i, j, z);
-	}
-	str[++k] = NULL;
-}
 
 char	**mini_choosing_final(t_shell *mini, char **matrix, char *s)
 {
@@ -91,7 +62,7 @@ char	**ft_mini_split(t_shell *mini, char *s, char c)
 		matrix[1] = NULL;
 	}
 	else
-		ft_mini_cicle(mini, s, matrix, i);
+		ft_mini_cicle(mini, s, matrix);
 	if (mini->exit == 1)
 		return (final);
 	final = mini_choosing_final(mini, matrix, s);
@@ -102,12 +73,10 @@ char	**creting_matrix_to_populate_nodes(char **matrix)
 {
 	int		i;
 	int		k;
-	int		z;
 	char	**final;
 
 	i = 0;
 	k = 0;
-	z = 1;
 	while (matrix[i])
 	{
 		if ((ft_strcmp(matrix[i], "&&") == 0)
@@ -122,10 +91,20 @@ char	**creting_matrix_to_populate_nodes(char **matrix)
 	return (final);
 }
 
+static char	*putil(char **final, char **matr, int k, int i)
+{
+	char	*res;
+
+	res = ft_strjoin_mini(final[k], matr[i], FREE, NO_FREE);
+	final[k] = ft_strtrim(res, ". ");
+	free(res);
+	return (final[k]);
+}
+
 char	**coping_matrix(char **matr, char **final)
 {
-	int	i;
-	int	k;
+	int		i;
+	int		k;
 
 	i = -1;
 	k = 0;
@@ -136,8 +115,7 @@ char	**coping_matrix(char **matr, char **final)
 		while (matr[i] && ((ft_strcmp(matr[i], "&&") != 0)
 				&& (ft_strcmp(matr[i], "||") != 0)))
 		{
-			final[k] = ft_strjoin_mini(final[k], matr[i], NO_FREE, NO_FREE);
-			final[k] = ft_strtrim(final[k], ". ");
+			final[k] = putil(final, matr, k, i);
 			i++;
 		}
 		if (matr[i] == NULL)

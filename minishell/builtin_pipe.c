@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_pipe.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/10 09:40:14 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/14 16:40:10 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:45:30 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:53:04 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	first_command(t_shell *mini, t_pipex *pipes, t_args *cur)
+static void	first_command(t_pipex *pipes, t_args *cur)
 {
 	if (cur->infile != NULL)
 	{
@@ -22,7 +22,7 @@ static void	first_command(t_shell *mini, t_pipex *pipes, t_args *cur)
 			dup2(pipes->fds[1], 1);
 		}
 		else if (cur->redirection_quantity == 2)
-			screening_terminal(mini, cur, pipes->fd);
+			screening_terminal(cur, pipes->fd);
 	}
 	if (cur->outfile != NULL)
 	{
@@ -38,14 +38,14 @@ static void	first_command(t_shell *mini, t_pipex *pipes, t_args *cur)
 		dup2(pipes->fds[(pipes->i) * 2 + 1], 1);
 }
 
-static void	last_command(t_shell *mini, t_pipex *pipes, t_args *cur)
+static void	last_command(t_pipex *pipes, t_args *cur)
 {
 	if (cur->infile != NULL)
 	{
 		if (cur->redirection_quantity == 1)
 			pipes->fd = open(cur->infile, O_RDONLY);
 		else if (cur->redirection_quantity == 2)
-			screening_terminal(mini, cur, pipes->fd);
+			screening_terminal(cur, pipes->fd);
 	}
 	if (cur->outfile != NULL)
 	{
@@ -61,14 +61,14 @@ static void	last_command(t_shell *mini, t_pipex *pipes, t_args *cur)
 		dup2(pipes->fds[(pipes->i - 1) * 2], 0);
 }
 
-static void	mid_command(t_shell *mini, t_pipex *pipes, t_args *cur)
+static void	mid_command(t_pipex *pipes, t_args *cur)
 {
 	if (cur->infile != NULL)
 	{
 		if (cur->redirection_quantity == 1)
 			pipes->fd = open(cur->infile, O_RDONLY);
 		else if (cur->redirection_quantity == 2)
-			screening_terminal(mini, cur, pipes->fd);
+			screening_terminal(cur, pipes->fd);
 	}
 	else
 		dup2(pipes->fds[(pipes->i - 1) * 2], 0);
@@ -118,11 +118,11 @@ void	builtin_pipe(t_shell *mini, t_pipex *pipes, t_args *cur)
 		dup2(pipes->fd_out, 1);
 	}
 	else if (pipes->i == 0 && pipes->i != pipes->num_pipes)
-		first_command(mini, pipes, cur);
+		first_command(pipes, cur);
 	else if (pipes->i == pipes->num_pipes && pipes->i != 0)
-		last_command(mini, pipes, cur);
+		last_command(pipes, cur);
 	else if (pipes->i != 0 && pipes->i != pipes->num_pipes)
-		mid_command(mini, pipes, cur);
-	builtin_exec(mini, mini->envp, cur, cur->command);
+		mid_command(pipes, cur);
+	builtin_exec(mini, cur, cur->command);
 	end_builtin(pipes);
 }

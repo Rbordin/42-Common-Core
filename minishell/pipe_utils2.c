@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dcologgi <dcologgi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/13 15:26:58 by enoviell          #+#    #+#             */
-/*   Updated: 2023/07/13 16:46:40 by dcologgi         ###   ########.fr       */
+/*   Created: 2023/09/11 16:49:14 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:51:00 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern int	g_exit_status;
 
-void	first_command_in_pipe(t_shell *mini, t_pipex *pipes,
+void	first_command_in_pipe(t_pipex *pipes,
 			t_args *cur, char ***commands)
 {
 	if (pipes->i == 0 && pipes->i != pipes->num_pipes)
@@ -28,7 +28,7 @@ void	first_command_in_pipe(t_shell *mini, t_pipex *pipes,
 			}
 			else if (cur->redirection_quantity == 2)
 			{
-				screening_terminal(mini, cur, pipes->fd);
+				screening_terminal(cur, pipes->fd);
 				if (ft_strcmp(cur->command, "/usr/bin/cat") == 0)
 					commands[0] = create_matri(cur);
 			}
@@ -51,7 +51,7 @@ void	last_command_w_outfile(t_pipex *pipes, t_args *cur)
 	}
 }
 
-void	last_command_in_pipe(t_shell *mini, t_pipex *pipes,
+void	last_command_in_pipe(t_pipex *pipes,
 			t_args *cur, char ***commands)
 {
 	if (pipes->i == pipes->num_pipes && pipes->i != 0)
@@ -65,7 +65,7 @@ void	last_command_in_pipe(t_shell *mini, t_pipex *pipes,
 			}
 			else if (cur->redirection_quantity == 2)
 			{
-				screening_terminal(mini, cur, pipes->fd);
+				screening_terminal(cur, pipes->fd);
 				if (ft_strcmp(cur->command, "/usr/bin/cat") == 0)
 					commands[pipes->i] = create_matri(cur);
 			}
@@ -92,7 +92,7 @@ void	mid_command_w_outfile(t_pipex *pipes, t_args *cur)
 		dup2(pipes->fds[pipes->i * 2 + 1], 1);
 }
 
-void	mid_command_in_pipe(t_shell *mini, t_pipex *pipes, t_args *cur,
+void	mid_command_in_pipe(t_pipex *pipes, t_args *cur,
 				char ***commands)
 {
 	if (pipes->i != 0 && pipes->i != pipes->num_pipes)
@@ -106,7 +106,7 @@ void	mid_command_in_pipe(t_shell *mini, t_pipex *pipes, t_args *cur,
 			}
 			else if (cur->redirection_quantity == 2)
 			{
-				screening_terminal(mini, cur, pipes->fd);
+				screening_terminal(cur, pipes->fd);
 				if (ft_strcmp(cur->command, "/usr/bin/cat") == 0)
 					commands[pipes->i] = create_matri(cur);
 			}

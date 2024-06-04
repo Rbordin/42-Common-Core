@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mini_split_utils3.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/05 15:56:28 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/17 13:37:19 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:42 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 16:07:32 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,4 +32,55 @@ int	operator_checker(const char *s, char control)
 		i++;
 	}
 	return (0);
+}
+
+void	ft_mini_cicle(t_shell *mini, char *s, char **str)
+{
+	int				i;
+	unsigned int	j;
+	unsigned int	k;
+	int				z;
+
+	i = 0;
+	k = -1;
+	while (s[i] != '\0')
+	{
+		while (s[i] == ' ')
+			i++;
+		j = i;
+		while (s[i] != ' ' && s[i] != '\0')
+		{
+			z = i;
+			if (s[i] == '\'' || s[i] == '\"')
+				z = mini_g(mini, s, i, s[i]);
+			i = z;
+			if (mini->exit == 1)
+				return ;
+			i++;
+		}
+		str[++k] = mini_p(mini, i, j, z);
+	}
+	str[++k] = NULL;
+}
+
+char	**new_function(char **matrix)
+{
+	int		i;
+	int		k;
+	char	**final;
+
+	i = 0;
+	k = 0;
+	final = NULL;
+	while (matrix[i])
+	{
+		if (matrix[i][0] == '|' || matrix[i][0] == '<' || matrix[i][0] == '>')
+			k++;
+		i++;
+	}
+	if (k == 0)
+		return (NULL);
+	final = ft_calloc(((2 * k) + 2), sizeof(char *));
+	final = new_new_function(matrix, final);
+	return (final);
 }

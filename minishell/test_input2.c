@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   test_input2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/06 17:19:38 by gpecci            #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:00 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:50:04 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:36:10 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_delimiter(char c, char *str, int i)
+int	is_delimiter(char c)
 {
 	return (c == '|' || c == '&');
 }
@@ -20,25 +20,30 @@ int	is_delimiter(char c, char *str, int i)
 char	*getting_final_string(char *s, char c)
 {
 	t_varie	*var;
+	char	*res;
 
 	var = ft_calloc(1, sizeof(t_varie));
 	init_varie(var, 0);
-	var->i = 0;
+	var->i = -1;
 	var->newstr = ft_calloc(ft_strlen(s) + counting(s) + 1, sizeof(char));
-	while (s[var->i])
+	while (s[++var->i])
 	{
 		if ((s[var->i] == c && c != '<' && c != '>') && s[var->i + 1] == ' ')
 			first_half(var, s, c);
-		else if ((s[var->i] == '<' || s[var->i] == '>')
+		else if (((s[var->i] == '<' && s[var->i + 1] != '<' )
+				|| (s[var->i] == '>' && s[var->i + 1] != '>'))
 			&& s[var->i + 1] != ' ')
-			sencond_half(var, s, c);
+			second_half(var, s);
 		var->newstr[var->z] = s[var->i];
-		var->i++;
 		var->z++;
 	}
 	var->newstr[var->z] = '\0';
+	if (var->newstr != NULL)
+		res = ft_strdup(var->newstr);
+	free(var->newstr);
+	free(var);
 	free(s);
-	return (var->newstr);
+	return (res);
 }
 
 int	counting(char *s)
@@ -62,10 +67,14 @@ int	counting(char *s)
 
 int	start(t_shell *mini)
 {
-	int	len;
+	int		len;
+	char	*temp;
 
-	mini->input = ft_strtrim(mini->input, " ");
-	len = strlen(mini->input);
+	temp = ft_strtrim(mini->input, " ");
+	free(mini->input);
+	mini->input = ft_strdup(temp);
+	free(temp);
+	len = ft_strlen(mini->input);
 	if (len == 0 || !mini->input)
 		return (0);
 	if (len > 0 && mini->input[len - 1] == '\n')

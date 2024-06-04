@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/16 13:57:51 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/17 13:38:48 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:49:19 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 15:56:17 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,32 +44,32 @@ void	august(t_shell *mini, t_pipex *pipes, t_args *cur, char ***commands)
 	}
 	free(commands);
 	free(pipes->fds);
+	free(pipes);
 	if (cur->next != NULL && ft_strncmp(cur->next->redirect, "||", 2) == 0
-		&& (WEXITSTATUS(g_exit_status) == 1 || mini->flag_status != 0))
+		&& (WEXITSTATUS(g_exit_status) != 0 || mini->flag_status != 0))
 		execpipe(mini, cur->next->next);
-	if (cur->next != NULL && ft_strncmp(cur->next->redirect, "&&", 2) == 0)
+	if (cur->next != NULL && ft_strncmp(cur->next->redirect, "&&", 2) == 0
+		&& (WEXITSTATUS(g_exit_status) == 0))
 		execpipe(mini, cur->next->next);
 }
 
-void	while_in_pipes(t_shell *mini, t_pipex *pipes, t_args *cur,
+t_args	*while_in_pipes(t_shell *mini, t_pipex *pipes, t_args *cur,
 		char ***commands)
 {
 	int	pid;
 
-	while (pipes->i <= pipes->num_pipes)
+	while (++pipes->i <= pipes->num_pipes)
 	{
 		init_fd(pipes);
 		if (check_builtin_presence(mini, cur->command) == 0)
 			builtin_pipe(mini, pipes, cur);
 		else if (check_builtin_presence(mini, cur->command) > 0)
 		{
+			signal(SIGINT, sig_ign);
 			pid = fork();
 			if (pid == 0)
 			{
-				no_pipes(mini, pipes, cur, commands);
-				first_command_in_pipe(mini, pipes, cur, commands);
-				last_command_in_pipe(mini, pipes, cur, commands);
-				mid_command_in_pipe(mini, pipes, cur, commands);
+				pipe_signal_utils(mini, pipes, cur, commands);
 				while (++pipes->j < pipes->num_pipes * 2)
 					close(pipes->fds[pipes->j]);
 				execve(commands[pipes->i][0], commands[pipes->i], mini->envp);
@@ -77,21 +77,20 @@ void	while_in_pipes(t_shell *mini, t_pipex *pipes, t_args *cur,
 		}
 		if (pipes->i < pipes->num_pipes)
 			cur = cur->next->next;
-		pipes->i++;
 	}
+	return (cur);
 }
 
 void	execpipe(t_shell *mini, t_args *node)
 {
 	t_args	*cur;
-	int		pid;
 	char	***commands;
 	t_pipex	*pipes;
 
 	commands = NULL;
 	cur = node;
 	pipes = malloc(sizeof(t_pipex));
-	init_pipexxx(pipes, mini, cur);
+	init_pipexxx(pipes, cur);
 	commands = malloc((pipes->num_pipes + 1) * sizeof(char **));
 	cur = node;
 	pipes->i = 0;
@@ -104,13 +103,13 @@ void	execpipe(t_shell *mini, t_args *node)
 	}
 	commands[pipes->num_pipes] = create_matri(cur);
 	cur = node;
-	pipes->i = 0;
-	while_in_pipes(mini, pipes, cur, commands);
+	pipes->i = -1;
+	cur = while_in_pipes(mini, pipes, cur, commands);
 	close_n_wait(pipes);
 	august(mini, pipes, cur, commands);
 }
 
-void	screening_terminal(t_shell *mini, t_args *node, int temp_fd)
+void	screening_terminal(t_args *node, int temp_fd)
 {
 	char	*buffer;
 	char	*res;
@@ -130,6 +129,7 @@ void	screening_terminal(t_shell *mini, t_args *node, int temp_fd)
 	{
 		temp_fd = open(".fa", O_TRUNC | O_CREAT | O_RDWR, 0777);
 		ft_putstr_fd(res, temp_fd);
+		free(node->argument);
 		node->argument = ft_strdup(".fa");
 		close(temp_fd);
 	}

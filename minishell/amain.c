@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dick.c                                             :+:      :+:    :+:   */
+/*   amain.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/30 16:46:47 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/17 13:25:15 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:46:22 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/29 11:59:07 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	g_exit_status = 0;
+extern int	g_exit_status;
 
 void	cloning_envp(t_shell *mini, char **envp)
 {
@@ -31,8 +31,13 @@ void	cloning_envp(t_shell *mini, char **envp)
 	mini->envp[i] = NULL;
 }
 
-static void	init_first_stage(t_shell *mini, char **envp)
+static void	init_first_stage(t_shell *mini, char **envp, int argc, char **argv)
 {
+	char	*temp;
+
+	(void)argc;
+	(void)argv;
+	mini->open = 0;
 	mini->syntax = "$";
 	mini->exit = 0;
 	mini->home = NULL;
@@ -41,9 +46,10 @@ static void	init_first_stage(t_shell *mini, char **envp)
 	mini->new_envp = NULL;
 	cloning_envp(mini, envp);
 	mini->home = getcwd(mini->home, sizeof(mini->home));
-	mini->main_path = get_my_env(mini, "PWD");
-	mini->main_path = ft_strcat(mini->main_path, "$ ");
+	temp = get_my_env(mini, "PWD");
+	mini->main_path = ft_strjoin(temp, "$ ", NO_FREE, NO_FREE);
 	mini->flag_status = 0;
+	free(temp);
 }
 
 static void	second_stage(t_shell *mini)
@@ -59,15 +65,14 @@ int	main(int argc, char **argv, char **envp)
 	t_shell	*mini;
 
 	mini = ft_calloc(1, sizeof(t_shell));
-	signal(SIGINT, handlectrlc);
-	signal(SIGQUIT, SIG_IGN);
-	init_first_stage(mini, envp);
+	init_first_stage(mini, envp, argc, argv);
 	while (mini->exit == 0)
 	{
 		mini->list = ft_calloc(1, sizeof(t_args *));
 		mini->high = ft_calloc(1, sizeof(t_args *));
 		init_flags(mini);
-		mini->input = readline(mini->main_path);
+		gest_signal();
+		mini->input = readline("Minishell--> ");
 		handlectrl(mini, envp);
 		if (ft_strlen(mini->input) != 0)
 			add_history(mini->input);
@@ -76,8 +81,8 @@ int	main(int argc, char **argv, char **envp)
 			insert_last_with_delimiter(mini, ' ');
 			if (mini->exit == 0)
 				second_stage(mini);
-			clear_list(mini);
 		}
+		clear_mini(mini, 0);
 		mini->exit = 0;
 	}
 	return (0);

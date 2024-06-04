@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dcologgi <dcologgi@student.42.fr>          +#+  +:+       +#+         #
+#    By: tpiras <tpiras@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/05/30 15:11:26 by rbordin           #+#    #+#              #
-#    Updated: 2023/07/13 16:27:10 by dcologgi         ###   ########.fr        #
+#    Created: 2023/09/11 16:48:16 by tpiras             #+#    #+#              #
+#    Updated: 2023/09/11 16:48:18 by tpiras            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 NAME = minishell
 
@@ -20,7 +21,7 @@ LIBFT = $(LIBFT_PATH)/libft.a
 
 MAKEFLAGS += --silent
 
-SRC = dick.c\
+SRC = amain.c\
 	ft_mini_split.c \
 	ft_mini_split_utils.c \
 	ft_mini_split_utils2.c \
@@ -51,19 +52,23 @@ SRC = dick.c\
 	builtin_pipe.c \
 	ft_echo_split.c \
 	echo_replacer.c \
+	echo_replacer2.c \
 	echo_utils.c  \
 	pipe.c \
 	pipe_utils.c  \
 	pipe_utils2.c \
 	matrix_utils.c \
-	
+	export_argu.c \
+	export_unset2.c \
+	echo_replacer_utils.c \
+
 OBJ = ${SRC:.c=.o}
 
 CC = gcc
 
 RM = rm -f
 
-CFLAGS = -W -W -W -g
+CFLAGS = -Wall -Wextra -Werror -g
 
 
 .o:.c
@@ -72,7 +77,16 @@ CFLAGS = -W -W -W -g
 ${NAME}:  ${OBJ}
 	make -C $(LIBFT_PATH)
 	${CC} $(CFLAGS) ${OBJ} ${LIBFT} -lreadline -o $(NAME)
-	@echo "\033[32mCompiled OK!\033[0m"
+	@echo "\033[31m	       (         )   (         )         (      (     \033[0m"
+	@echo "\033[31m(        )\ )   ( /(   )\ )   ( /(         )\ )   )\ ) \033[0m"
+	@echo "\033[31m)\))(   (()/(   )\()) (()/(   )\())  (    (()/(  (()/( \033[0m"
+	@echo "\033[31m((_)()\   /(_)) ((_)\   /(_)) ((_)\   )\    /(_))  /(_)) \033[0m"
+	@echo "\033[31m(_()((_) (_))    _((_) (_))    _((_) ((_)  (_))   (_))    \033[0m"
+	@echo "\033[31m|  \/  | |_ _|  | \| | |_ _|  | || | | __| | |    | |     \033[0m"
+	@echo "\033[31m| |\/| |  | |   | .  |  | |   | __ | | _|  | |__  | |__   \033[0m"
+	@echo "\033[31m|_|  |_| |___|  |_|\_| |___|  |_||_| |___| |____| |____|   \033[0m"
+	@echo "\033[31m                                                          \033[0m"
+	@echo "\033[31m PERDETE OGNI SPERANZA O VOI CHE PROGRAMMATE!\033[0m"
 
 all: ${NAME}
 

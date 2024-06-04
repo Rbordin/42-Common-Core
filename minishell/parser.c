@@ -3,26 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: enoviell <enoviell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/31 09:45:37 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/17 13:36:35 by enoviell         ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:54 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:57:54 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+extern int	g_exit_status;
+
 static void	path_related(t_shell *mini, char *temp, int i)
 {
+	char	*res;
+
+	res = check_path(mini, temp);
 	if (temp[0] == '/' && check_path2(mini, temp) == 1
 		&& check_builtin_presence(mini, temp) == 1)
 		its_a_command(mini, temp);
-	else if (check_path(mini, temp) != NULL
-		&& check_builtin_presence(mini, temp) == 1)
+	else if (res != NULL && check_builtin_presence(mini, temp) == 1)
 		its_a_command(mini, temp);
-	else if (check_path(mini, temp) == NULL)
+	else if (res == NULL)
 	{
-		its_not_a_command(mini, temp, i);
+		its_not_a_command(mini, temp);
 		if (mini->exit == 1)
 			return ;
 	}
@@ -34,6 +38,7 @@ static void	path_related(t_shell *mini, char *temp, int i)
 	}
 	if (temp[0] == '$' && (*mini->high)->order == 0 && i == 0)
 		mini->dollar_flag = 1;
+	free(res);
 }
 
 static int	not_path_related(t_shell *mini, char **temp, int i)
@@ -44,10 +49,34 @@ static int	not_path_related(t_shell *mini, char **temp, int i)
 	{
 		if ((*mini->high)->argument == NULL)
 			its_a_flag(mini, temp[i]);
+		else
+			((*mini->high)->argument = ft_strjoin_mini((*mini->high)->argument,
+						temp[i], FREE, NO_FREE));
 	}
 	else if (temp[i][0] == '\'' || temp[i][0] == '\"')
 		i = reassembling_strings(mini, temp, i);
 	return (i);
+}
+
+static void	plug(t_shell *mini, char **temp, int i)
+{
+	if ((!apices(temp[i], '\'', 1)
+			|| !apices(temp[i], '\"', 1))
+		&& (*mini->high)->argument == NULL)
+		(*mini->high)->argument = ft_strdup(temp[i]);
+	else if ((!apices(temp[i], '\'', 1)
+			|| !apices(temp[i], '\"', 1))
+		&& (*mini->high)->argument != NULL)
+		(*mini->high)->argument = ft_strjoin_mini((*mini->high)->argument,
+				temp[i], FREE, NO_FREE);
+	else if (temp[i][0] == '(' || temp[i][0] == '-'
+		|| temp[i][0] == '\'' || temp[i][0] == '\"')
+		i = not_path_related(mini, temp, i);
+	else if (check_builtin_presence(mini, temp[i]) == 0
+		&& (*mini->high)->command == NULL)
+		(*mini->high)->command = ft_strdup(temp[i]);
+	else
+		path_related(mini, temp[i], i);
 }
 
 static void	anal(t_shell *mini, char **temp)
@@ -57,17 +86,7 @@ static void	anal(t_shell *mini, char **temp)
 	i = 0;
 	while (temp[i])
 	{
-		if (!apices(temp[i], '\'', 1)
-			|| !apices(temp[i], '\"', 1))
-			(*mini->high)->argument = ft_strdup(temp[i]);
-		else if (temp[i][0] == '(' || temp[i][0] == '-'
-			|| temp[i][0] == '\'' || temp[i][0] == '\"')
-			i = not_path_related(mini, temp, i);
-		else if (check_builtin_presence(mini, temp[i]) == 0
-			&& (*mini->high)->command == NULL)
-			(*mini->high)->command = ft_strdup(temp[i]);
-		else
-			path_related(mini, temp[i], i);
+		plug(mini, temp, i);
 		i++;
 		if (temp[i] == NULL && (*mini->high)->command != NULL)
 			checking_node_vilidity(mini);
@@ -78,28 +97,16 @@ static void	anal(t_shell *mini, char **temp)
 
 void	analizer(t_shell *mini, char **envp)
 {
-	int		res;
 	char	**temp;
 
+	(void)envp;
 	temp = ft_echo_split(mini, (*mini->high)->str, 32);
-	if (!apices((*mini->high)->str, '\'', 1)
-		|| !apices((*mini->high)->str, '\"', 1))
-		(*mini->high)->argument = ft_strdup((*mini->high)->str);
-	else
+	anal(mini, temp);
+	if ((*mini->high)->command == NULL && (*mini->high)->redirect == NULL)
 	{
-		anal(mini, temp);
-		if ((*mini->high)->command == NULL && (*mini->high)->redirect == NULL)
-		{
-			mini->flag_status = 127;
-			printf("command not found\n");
-		}
+		printf("%s: command not found\n", temp[0]);
+		mini->flag_status = 127;
+		g_exit_status = 127;
 	}
 	free_matrix(temp);
-}
-
-int	check_path2(t_shell *mini, char *s)
-{
-	if (access(s, F_OK) == 0)
-		return (1);
-	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_mini_split.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gpecci <gpecci@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/02 12:32:11 by rbordin           #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:00 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:47:47 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/27 12:30:58 by gpecci           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,9 @@
 int	apices(const char *s, char control, int pos)
 {
 	int	i;
-	int	z;
 	int	flag;
 
 	flag = 0;
-	z = 0;
 	i = 0;
 	while (i <= pos)
 	{
@@ -73,11 +71,9 @@ char	*ft_strjoin_mini(char const *s1, char const *s2, int free1, int free2)
 int	checking_brackets_for_operator(const char *s, int pos)
 {
 	int	i;
-	int	z;
 	int	flag;
 
 	flag = 0;
-	z = 0;
 	i = 0;
 	while (i <= pos)
 	{
@@ -99,34 +95,21 @@ int	checking_brackets_for_operator(const char *s, int pos)
 	return (1);
 }
 
-char	**new_function(char **matrix)
+static int	new_new_new_function(char **matrix, char **final, int k, int i)
 {
-	int		i;
-	int		k;
-	int		z;
-	char	**final;
-
-	i = 0;
-	k = 0;
-	z = 1;
-	final = NULL;
-	while (matrix[i])
+	if (matrix[i][0] == '|' || matrix[i][0] == '<' || matrix[i][0] == '>')
 	{
-		if (matrix[i][0] == '|' || matrix[i][0] == '<' || matrix[i][0] == '>')
-			k++;
-		i++;
+		k++;
+		final[k++] = ft_strdup(matrix[i]);
 	}
-	if (k == 0)
-		return (NULL);
-	final = ft_calloc(((2 * k) + 2), sizeof(char *));
-	final = new_new_function(matrix, final);
-	return (final);
+	return (k);
 }
 
 char	**new_new_function(char **matrix, char **final)
 {
-	int	i;
-	int	k;
+	int		i;
+	int		k;
+	char	*temp;
 
 	i = -1;
 	k = 0;
@@ -137,17 +120,16 @@ char	**new_new_function(char **matrix, char **final)
 		while (matrix[i] && (matrix[i][0] != '|' || matrix[i][0] != '<'
 			|| matrix[i][0] != '>'))
 		{
-			final[k] = ft_strjoin_mini(final[k], matrix[i], NO_FREE, NO_FREE);
-			final[k] = ft_strtrim(final[k], ". ");
+			final[k] = ft_strjoin_mini(final[k], matrix[i], FREE, NO_FREE);
+			temp = ft_strtrim(final[k], ". ");
+			free(final[k]);
+			final[k] = ft_strdup(temp);
+			free(temp);
 			i++;
 		}
 		if (matrix[i] == NULL)
 			break ;
-		if (matrix[i][0] == '|' || matrix[i][0] == '<' || matrix[i][0] == '>')
-		{
-			k++;
-			final[k++] = ft_strdup(matrix[i]);
-		}
+		k = new_new_new_function(matrix, final, k, i);
 	}
 	return (final);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lists_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dborgian <dborgian@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/11 11:58:33 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/12 15:46:53 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:48:02 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/16 12:48:25 by dborgian         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,30 +25,39 @@ void	test(t_shell *mini, t_args *new_node)
 	*mini->high = new_node;
 }
 
+static void	freaks(t_args *current)
+{
+	if (current->redirect != NULL)
+		free(current->redirect);
+	if (current->infile != NULL)
+		free(current->infile);
+	if (current->outfile != NULL)
+		free(current->outfile);
+}
+
 void	clear_list(t_shell *mini)
 {
 	t_args	*current;
+	t_args	*next;
 
-	current = (*mini->list);
-	while ((*mini->list) != NULL)
+	current = *mini->list;
+	while (current != NULL)
 	{
+		next = current->next;
 		if (current->str != NULL)
-			free((*mini->list)->str);
+			free(current->str);
 		if (current->command != NULL)
-			free((*mini->list)->command);
+			free(current->command);
 		if (current->flags != NULL)
-			free((*mini->list)->flags);
+			free(current->flags);
 		if (current->argument != NULL)
-			free((*mini->list)->argument);
-		if (current->redirect != NULL)
-			free((*mini->list)->redirect);
-		current = (*mini->list)->next;
-		(*mini->list) = (*mini->list)->next;
+			free(current->argument);
+		freaks(current);
+		free(current);
+		current = next;
 	}
 	free(mini->list);
-	(mini->list) = NULL;
 	free(mini->high);
-	(mini->high) = NULL;
 }
 
 void	init_node(t_args *node)
@@ -61,4 +70,18 @@ void	init_node(t_args *node)
 	node->infile = NULL;
 	node->outfile = NULL;
 	node->redirection_quantity = 0;
+}
+
+void	clear_mini(t_shell *mini, int flag)
+{
+	clear_list(mini);
+	free(mini->input);
+	if (flag == 1)
+	{
+		free(mini->main_path);
+		free_matrix(mini->envp);
+		if (mini->new_envp != NULL)
+			free_matrix(mini->new_envp);
+		free(mini);
+	}
 }

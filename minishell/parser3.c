@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbordin <rbordin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dborgian <dborgian@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/07 15:26:51 by riccardobor       #+#    #+#             */
-/*   Updated: 2023/07/14 17:11:00 by rbordin          ###   ########.fr       */
+/*   Created: 2023/09/11 16:49:05 by tpiras            #+#    #+#             */
+/*   Updated: 2023/11/16 12:47:54 by dborgian         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,29 +60,53 @@ int	check_redirection(char *s)
 	return (k);
 }
 
+static char	*ck_pa(char **temp, char *command)
+{
+	int		i;
+	char	*tampax;
+	char	*support;
+
+	i = -1;
+	while (temp[++i])
+	{
+		tampax = ft_strjoin(temp[i], "/", NO_FREE, NO_FREE);
+		support = ft_strjoin(tampax, command, NO_FREE, NO_FREE);
+		if (access(support, F_OK) == 0)
+		{
+			free(tampax);
+			free_matrix(temp);
+			return (support);
+		}
+		free(support);
+		free(tampax);
+	}
+	free_matrix(temp);
+	return (NULL);
+}
+
 char	*check_path(t_shell *mini, char *command)
 {
 	char	*path;
 	char	*support;
 	char	**temp;
-	int		i;
 
-	i = -1;
 	path = get_my_env(mini, "PATH");
 	if (!path)
 		return (NULL);
 	temp = ft_split(path, ':');
-	while (temp[++i])
-	{
-		temp[i] = ft_strjoin(temp[i], "/", NO_FREE, NO_FREE);
-		support = ft_strjoin(temp[i], command, NO_FREE, NO_FREE);
-		if (access(support, F_OK) == 0)
-		{
-			free_matrix(temp);
-			return (support);
-		}
-		free(support);
-	}
-	free_matrix(temp);
-	return (NULL);
+	free(path);
+	support = ck_pa(temp, command);
+	return (support);
+}
+
+int	check_path2(t_shell *mini, char *s)
+{
+	char	*path;
+
+	path = get_my_env(mini, "PATH");
+	if (!path)
+		return (0);
+	if (access(s, F_OK) == 0)
+		return (1);
+	return (0);
 }
