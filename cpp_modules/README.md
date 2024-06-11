@@ -41,3 +41,6 @@ Modules
   - Module 08: Templated Containers and Algorithms
     - Topics Covered: Templated containers, iterators, algorithms.
     - Objectives: Understand the use of templates in the Standard Template Library (STL) and how to implement your own templated containers and algorithms.
+  - Module 09: Advanced Topics
+    - Topics Covered: Advanced C++ topics such as metaprogramming, smart pointers, move semantics, and concurrency.
+    - Objectives: Gain a deeper understanding of advanced C++ concepts and modern C++ best practices.
